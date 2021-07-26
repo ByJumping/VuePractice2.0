@@ -27,7 +27,7 @@
         <li class="list-item"
             v-for="(note, idx) in notes"
         >
-          {{note}}
+          {{toUpperCase(note)}}
           <button class="btn danger"
                   v-on:click="removeNote(idx)"
           >Удалить</button>
