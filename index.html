@@ -29,7 +29,10 @@
         <li class="list-item"
             v-for="(note, idx) in notes"
         >
-          {{toUpperCase(note)}}
+          <span :class="{
+          primary: true,
+          bold: note.length > 5
+          }">{{toUpperCase(note)}}</span>
           <button class="btn danger"
                   @click="removeNote(idx)"
           >Удалить</button>
