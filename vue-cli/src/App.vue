@@ -10,6 +10,8 @@
       :title="item.title"
       :id="item.id"
       :is-open="item.isOpen"
+      :was-read="item.wasRead"
+      @unmark="unreadNews"
       @open-news="openNews"
       @read-news="readNews"
     />
@@ -26,29 +28,40 @@ export default {
   components: {
     'app-news': AppNews
   },
-  data: ()=> ({
-    openRate: 0,
-    readRate: 0,
-    now: new Date().toLocaleDateString(),
-    news: [
-      {
-        title: 'Джо байден победил на выборах в США',
-        id: 1,
-        isOpen: false
-      },
-      {
-        title: 'Vue 3 успешно работает',
-        id: 2,
-        isOpen: false
-      }
-    ]
-  }),
+  data () {
+    return {
+      openRate: 0,
+      readRate: 0,
+      now: new Date().toLocaleDateString(),
+      news: [
+        {
+          title: 'Джо байден победил на выборах в США',
+          id: 1,
+          isOpen: false,
+          wasRead: false
+        },
+        {
+          title: 'Vue 3 успешно работает',
+          id: 2,
+          isOpen: false,
+          wasRead: false
+        }
+      ]
+    }
+  },
   methods: {
-    readNews() {
+    readNews(id) {
+      const idx = this.news.findIndex(news=> news.id === id)
+      this.news[idx].wasRead = true
       this.readRate++
     },
     openNews() {
       this.openRate++
+    },
+    unreadNews(id) {
+      const news = this.news.find(news=> news.id === id)
+      news.wasRead = false
+      this.readRate--
     }
   }
 }
