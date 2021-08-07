@@ -1,26 +1,59 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="container pt-1">
+    <div class="card">
+      <h2>Актуальные новости {{now}}</h2>
+      <span>Открыто: <strong>{{ openRate }} </strong> | Прочитано: <strong>{{ readRate }}</strong></span>
+    </div>
+    <app-news
+      v-for="item in news"
+      :key="item.id"
+      :title="item.title"
+      :id="item.id"
+      :is-open="item.isOpen"
+      @open-news="openNews"
+      @read-news="readNews"
+    />
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+
+
+import AppNews from "./AppNews";
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    'app-news': AppNews
+  },
+  data: ()=> ({
+    openRate: 0,
+    readRate: 0,
+    now: new Date().toLocaleDateString(),
+    news: [
+      {
+        title: 'Джо байден победил на выборах в США',
+        id: 1,
+        isOpen: false
+      },
+      {
+        title: 'Vue 3 успешно работает',
+        id: 2,
+        isOpen: false
+      }
+    ]
+  }),
+  methods: {
+    readNews() {
+      this.readRate++
+    },
+    openNews() {
+      this.openRate++
+    }
   }
 }
 </script>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style>
+
 </style>
