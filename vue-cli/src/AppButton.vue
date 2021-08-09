@@ -12,7 +12,7 @@ export default {
   props: {
     text: {
       String,
-      required: true
+      required: false
     },
     color: {
       type: String,

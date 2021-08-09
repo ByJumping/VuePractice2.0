@@ -1,36 +1,65 @@
 <template>
   <div class="container pt-1">
     <div class="card">
-      <h2>Slots</h2>
+      <async-component></async-component>
+      <h2>Динамические и асинхронные компоненты</h2>
+
+      <app-button
+        :color="oneColor"
+        @action="active = 'one'"
+      >One</app-button>
+      <app-button
+        :color="twoColor"
+        @action="active = 'two'"
+      >Two</app-button>
     </div>
 
-    <app-list>
-      <template #default="{idx, iter}">
-      <span style="color: darkred">
-        <strong>{{ idx + 1 }}</strong>
-        Item: {{ iter }}</span>
-      </template>
-    </app-list>
 
-    <app-block>
-      <p>Это самый важный текст этого блока</p>
-      <template #header>
-        <h3>Это заголовок!</h3>
-      </template>
-      <template #footer>
-        <hr/>
-        Это футер
-      </template>
-    </app-block>
+    <keep-alive>
+    <component :is="componentName"></component>
+    </keep-alive>
+
   </div>
 </template>
 
 <script>
-import AppBlock from "./AppBlock";
-import AppList from "./AppList";
 
+import AppTextOne from "./AppTextOne";
+import AppTextTwo from "./AppTextTwo";
+import AppButton from "./AppButton";
+import AppAsyncComponent from "./AppAsyncComponent";
 export default {
-  components: {AppBlock, AppList}
+  data() {
+    return {
+      active: 'one' // two
+    }
+  },
+  mounted() {
+    setTimeout(() => {
+      this.componentName = 'Новое название'
+    }, 1500)
+  },
+  computed: {
+    // componentName() {
+    //   return 'app-text-' + this.active
+    //  },
+
+    componentName: {
+      get() {
+        return 'app-text-' + this.active
+      },
+      set(value) {
+        console.log('Теперь название компонента', value)
+      }
+        },
+     oneColor() {
+      return this.active === 'one' ? 'primary' : ''
+     },
+    twoColor() {
+      return this.active === 'two' ? 'primary' : ''
+    }
+  },
+  components: {AppAsyncComponent, AppButton, AppTextOne, AppTextTwo}
 }
 </script>
 
