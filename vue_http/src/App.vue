@@ -1,23 +1,32 @@
 <template>
-  <div class="container">
-    <form class="card" @submit.prevent="createPerson">
-      <h2>Работа с базой данных</h2>
+    <div class="container">
+        <form class="card" @submit.prevent="createPerson">
+            <h2>Работа с базой данных</h2>
 
-        <div class="form-control">
-            <label for="name">Введите имя</label>
-            <input type="text" id="name" v-model.trim="name">
-        </div>
+            <div class="form-control">
+                <label for="name">Введите имя</label>
+                <input type="text" id="name" v-model.trim="name">
+            </div>
 
-        <button class="btn primary" :disabled="name.length === 0">Создать человека</button>
-    </form>
-  </div>
+            <button class="btn primary" :disabled="name.length === 0">Создать человека</button>
+        </form>
+
+        <app-people-list
+                @load="loadPeople"
+                :people="people"></app-people-list>
+    </div>
 </template>
 
 <script>
+
+import AppPeopleList from "./AppPeopleList";
+import axios from 'axios'
+
 export default {
     data() {
         return {
-            name: ''
+            name: '',
+            people: []
         }
     },
     methods: {
@@ -33,8 +42,21 @@ export default {
             })
             const firebaseData = await response.json()
             console.log(firebaseData)
-            this.name =''
+            this.name = ''
+        },
+
+        async loadPeople() {
+            const {data} = await axios.get('https://vue-with-http-d98a9-default-rtdb.europe-west1.firebasedatabase.app/people.json')
+            this.people = Object.keys(data).map(key => {
+                return {
+                    id: key,
+                    ...data[key]
+                }
+            })
         }
+    },
+    components: {
+        AppPeopleList
     }
 }
 </script>
