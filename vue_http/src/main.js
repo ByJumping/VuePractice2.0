@@ -5,6 +5,3 @@ import './theme.css'
 
 
 createApp(App).mount('#app')
-
-
-

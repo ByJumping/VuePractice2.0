@@ -1,5 +1,7 @@
 <template>
     <div class="container">
+        <app-alert :alert="alert" @close="alert = null"></app-alert>
+
         <form class="card" @submit.prevent="createPerson">
             <h2>Работа с базой данных</h2>
 
@@ -11,8 +13,12 @@
             <button class="btn primary" :disabled="name.length === 0">Создать человека</button>
         </form>
 
+        <app-loader v-if="loading"></app-loader>
+
         <app-people-list
+                v-else
                 @load="loadPeople"
+                @delete="deletePerson"
                 :people="people"></app-people-list>
     </div>
 </template>
@@ -21,13 +27,20 @@
 
 import AppPeopleList from "./AppPeopleList";
 import axios from 'axios'
+import AppAlert from "./AppAlert";
+import AppLoader from "./AppLoader";
 
 export default {
     data() {
         return {
             name: '',
-            people: []
+            people: [],
+            alert: null,
+            loading: false
         }
+    },
+    mounted() {
+        this.loadPeople()
     },
     methods: {
         async createPerson() {
@@ -41,22 +54,58 @@ export default {
                 })
             })
             const firebaseData = await response.json()
-            console.log(firebaseData)
+            this.people.push({
+                firstName: this.name,
+                id: firebaseData.name
+            })
             this.name = ''
         },
 
-        async loadPeople() {
-            const {data} = await axios.get('https://vue-with-http-d98a9-default-rtdb.europe-west1.firebasedatabase.app/people.json')
-            this.people = Object.keys(data).map(key => {
-                return {
-                    id: key,
-                    ...data[key]
+        loadPeople() {
+            this.loading = true
+            setTimeout(async ()=> {
+                try {
+                    const {data} = await axios.get('https://vue-with-http-d98a9-default-rtdb.europe-west1.firebasedatabase.app/people.json')
+                    if (!data) {
+                        throw new Error('Список людей пуст')
+                    }
+                    this.people = Object.keys(data).map(key => {
+                        return {
+                            id: key,
+                            ...data[key]
+                        }
+                    })
+                    this.loading = false
+                } catch (e) {
+                    this.loading = false
+                    this.alert = {
+                        type: 'danger',
+                        title: 'Ошибка',
+                        text: e.message
+                    }
                 }
-            })
+            }, 1000)
+        },
+
+        async deletePerson(id) {
+            try {
+                const name = this.people.find(p=> p.id === id).firstName
+                await axios.delete(`https://vue-with-http-d98a9-default-rtdb.europe-west1.firebasedatabase.app/people/${id}.json`)
+                this.people = this.people.filter(item => item.id !== id)
+                this.alert = {
+                    type: 'primary',
+                    title: 'Успешно!',
+                    text: `Пользователь с именем "${name}" был удален!`
+                }
+            } catch(e) {
+
+            }
         }
     },
     components: {
-        AppPeopleList
+        AppPeopleList,
+        AppAlert,
+        AppLoader
     }
 }
 </script>
